@@ -1,0 +1,23 @@
+#练习描述符
+#定义 温度类，摄氏度类，华氏度类
+#在温度类中创建摄氏度对象和华氏度对象
+#设置摄氏度时，自动设置华氏度
+#设置华氏度时自动设置摄氏度
+class Ctem:
+    def __init__(self):
+        self.value = 0 #设置默认值，在没有使用set方法时使用该默认值
+    def __set__(self, instance, value):
+        self.value = value
+    def __get__(self, instance, owner):
+        return self.value
+class Ftem:
+    def __set__(self, instance, value):
+        instance.c = (value-32)/1.8
+    def __get__(self, instance, owner):
+        return instance.c*1.8+32
+class Tem:
+    #这里不需要设置属性，更没有私有属性，所以不需要get/set方法间接获取
+    #更凸显了描述符的本质
+    #即可以通过关键字触发增删改魔法方法，将一个类更加真实地模拟成一个在其他类中地属性
+    c = Ctem()
+    f = Ftem()
