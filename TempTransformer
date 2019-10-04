@@ -25,3 +25,4 @@ class Tem:
 t = Tem()
 t.f = 100
 print(t.c)
+
