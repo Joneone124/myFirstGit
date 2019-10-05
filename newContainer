@@ -1,0 +1,36 @@
+#实现一个可变类型序列，和列表功能一样
+#多一个记录每个元素访问次数的功能
+class newContainer:
+    def __init__(self,iterable):
+        #用列表实现，先将传入的可迭代对象依次放入列表中
+        self.__l1 = [i for i in iterable]
+        #用字典存储各个元素的访问次数，赋初值为0
+        self.__dic = {i:0 for i in iterable}
+
+    def __len__(self):
+        return len(self.__l1)
+
+    def __getitem__(self, item):#这里的item指的是外面访问时，[ ]中的东西
+        self.__dic[self.__l1[item]] += 1#字典的键是该元素，所以需要通过item从列表中获得该元素，再用元素作为键访问到字典
+        return self.__l1[item]
+
+    def __setitem__(self, key, value):#这里的key指的是外面访问时，[ ]中的东西,value是要设置的数据
+        self.__l1[key] = value
+
+    def __delitem__(self, key):
+        #先删掉字典里的该元素的信息，再删掉该元素，不然字典中的没法寻找
+        del self.__dic[self.__l1[key]]
+        del self.__l1[key]
+
+    def __str__(self):#该魔法方法由print()触发，用于展示容器中数据
+        return str(self.__l1)
+
+    def getItemCont(self):#返回容器中各元素的访问情况
+        return self.__dic
+
+ne = newContainer('abcdef')
+print(ne)
+print(ne[0])
+print(ne.getItemCont())
+del ne[1]
+print(ne)
