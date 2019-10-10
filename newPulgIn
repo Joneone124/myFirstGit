@@ -1,0 +1,51 @@
+#插件模式编程
+#实现a.plugIn(c)可以把a对象的所有方法增强给c
+class PlugIn:
+    def __init__(self):
+        self.methods=[]#创建一个列表用于存放别的类的方法，再通过plugIn方法给目标类扩展增强
+    def plugIn(self,obj):#obj为被扩展的对象
+        for method in self.methods:
+            #用循环遍历增强方法的存储列表method，把列表中所有的方法给目标方法增强
+            #obj的字典中存储着其拥有的所有方法，可以用给字典赋值的方式增加方法，达到扩展目的
+            obj.__dict__[method.__name__] = method#利用字典的特性
+    def plugOut(self,obj):
+        #遍历存放增强方法的列表，将增强方法列表中的增强方法全部从obj中收回
+        for method in self.methods:
+            del obj.__dict__[method.__name__]
+
+class A(PlugIn):#继承了PlugIn的所有东西
+    def __init__(self):
+        # 为了创建列表,临时写一个父类对象super（），调用父类__init__（)函数
+        #注意，是super()而不是super，因为__init__()不是类方法，不能通过类直接调用
+        super().__init__()
+        self.methods.append(self.heheA)
+        self.methods.append(self.heheA2)
+    def heheA(self):#增强方法
+        print('heheA')
+    def heheA2(self):#增强方法
+        print('heheA2')
+class B(PlugIn):#继承了PlugIn的所有东西
+    def __init__(self):
+        super().__init__()# 为了创建列表
+        self.methods.append(self.heheB)
+        self.methods.append(self.heheB2)
+    def heheB(self):#增强方法
+        print('heheB')
+    def heheB2(self):#增强方法
+        print('heheB2')
+
+class C:
+    pass
+
+a = A()
+b = B()
+c = C()
+
+a.plugIn(c)#a对象中的所有方法给c增强
+b.plugIn(c)
+c.heheA()
+c.heheA2()
+c.heheB()
+c.heheB2()
+#a.plugOut(c)#把a给c增强的所有方法收回
+#c.heheA()#此时再通过c调用之前a的增强方法，会报错。
