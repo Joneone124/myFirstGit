@@ -1,0 +1,187 @@
+class User:
+    def __init__(self,ids=0,name='',pwd='',phone='',mail=''):
+        '''
+
+        :param name: 用户姓名
+        :param pwd: 密码
+        :param phone: 电话
+        :param mail: 邮箱
+        '''
+        self.ids = ids
+        self.name = name
+        self.pwd = pwd
+        self.phone = phone
+        self.mail = mail
+
+class Book:
+    def __init__(self,ids,name,author,price,category,desc):
+        '''
+
+        :param ids:书号
+        :param name: 书名
+        :param author: 作者
+        :param price: 价格
+        :param category: 类别
+        :param desc: 评价
+        '''
+        self.ids = ids
+        self.name = name
+        self.author = author
+        self.price = price
+        self.category = category
+        self.desc = desc
+
+class DataBase:
+    def __init__(self):
+        #用列表存储书籍
+        self.l = []
+    #添加书籍或用户，每个书籍都是一个对象
+    def add(self,obj):
+        self.l.append(obj)
+    #修改书籍
+    def modify(self,ids,*args):
+        pass
+    #删除书籍
+    def remove(self,ids):
+        for obj in self.l:
+            if ids == obj.ids:
+                self.l.remove(obj)#这里可以用del吗？
+    #查询书籍
+    def select(self,ids):
+        for i in self.l:
+            if i.ids==ids:
+                return i
+    #返回数据库的迭代器，因为数据库对象不是可迭代对象，如果在后边要循环遍历数据库，就要在这里用该方法
+    def __iter__(self):
+        return iter(self.l)
+
+class Manager:#业务
+    #先初始化数据库
+    def __init__(self):
+        self.userDB = DataBase()
+        self.userDB.add(User(ids=1,name='xiaobo', pwd='123456'))
+        self.userDB.add(User(ids=2, name='admin', pwd='123456'))
+        self.userDB.add(User(ids=3, name='hehe', pwd='123456'))
+        self.bookDB = DataBase()
+        self.bookDB.add(Book(ids=1, name='book1', author='xiaozhang', price=20, category='science', desc=5))
+        self.bookDB.add(Book(ids=2, name='book2', author='xiaowang', price=30, category='education', desc=4))
+        self.bookDB.add(Book(ids=3, name='book3', author='xiaoli', price=50, category='economy', desc=5))
+    #打印欢迎界面
+    def welcome(self):
+        print('********图书管理系统*********')
+    #获取用户登录或注册
+    def getUserInput(self):
+        return input('1.登录  2. 注册  3. 修改密码')
+    #登录
+    def login(self):
+        name = input('name:')
+        pwd = input('password:')
+        for i in self.userDB:
+            if i.name ==name and i.pwd == pwd:
+                return True
+        return False
+    # 注册
+    def register(self):
+        ids = input('ids:')
+        name = input('name:')
+        pwd = input('password:')
+        self.userDB.add(User(ids=ids,name=name,pwd=pwd))
+        return True
+
+    # 修改密码
+    def changePwd(self):
+        ids = input('ids:')
+        name = input('name:')
+        newPwd = input('new password:')
+        for i in self.userDB:
+            if i.ids == ids and i.name == name:
+                i.pwd = newPwd
+                return True
+        return False
+    # 展示管理系统界面
+    def librarySystem(self):
+       while 1:
+           r = str(input('1. 查询书籍  2. 修改书籍  3. 添加书籍 4. 删除书籍'))
+           if r == '1':
+               a = self.search()
+               print(a)
+           if r == '2':
+               if self.modifyBook():
+                   print('修改成功！')
+           if r == '3':
+               if self.addBook():
+                   print('添加成功！')
+           if r == '4':
+               if self.removeBook():
+                   print('删除成功！')
+    # 查询书籍
+    def search(self):
+        r = str(input('请输入书籍编号：'))
+        for i in self.userDB:
+            if i.ids == r:
+                return i
+
+    # 修改书籍
+    def modifyBook(self):
+        r = str(input('请输入书籍编号：'))
+        newName = input('请输入新书名：')
+        newAuthor = input('请输入新作者：')
+        newPrice = input('请输入新价格：')
+        newCate = input('请输入新类别：')
+        newDesc = input('请输入新评价：')
+        for i in self.bookDB:
+            if i.ids == r:
+                i.name = newName
+                i.author = newAuthor
+                i.price = newPrice
+                i.category = newCate
+                i.desc = newDesc
+                return True
+        return False
+
+    # 添加书籍
+    def addBook(self):
+        ids = input('请输入书籍编号：')
+        name = input('请输入新书名：')
+        author = input('请输入新作者：')
+        price = input('请输入新价格：')
+        cate = input('请输入新类别：')
+        desc = input('请输入新评价：')
+        self.bookDB.add(Book(ids=ids, name=name, author=author, price=price, category=cate, desc=desc))
+        return True
+    # 删除书籍
+    def removeBook(self):
+        r = str(input('请输入书籍编号：'))
+        self.bookDB.remove(r)
+        return True
+    # 退出系统
+    def exit(self):
+        self.login()
+
+    # 管理程序（操作系统）
+    def manager(self):
+        self.welcome()
+        while 1:
+            r = self.getUserInput()
+            if r =='1':
+                #登录
+                if self.login():
+                    print('登录成功！')
+                    self.librarySystem()
+            elif r == '2':
+                #注册
+                if self.register():
+                    print('注册成功')
+            elif r == '3':
+                #修改密码：
+                if self.changePwd():
+                    print('修改成功')
+            else:
+                print('输入有误，请重新输入：')
+
+def start():
+    Manager().manager()#记得Manager后要带括号
+    # 或写为：
+    # m = Manager()
+    # m.manager()
+start()
